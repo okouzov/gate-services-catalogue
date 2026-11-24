@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GATE Services Catalogue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;700;800&family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE work: a service catalogue a client browses to find where to start
+   IDEA a route map: five coloured stations from first assessment to trained teams
+   PICTURE the route strip, one colour field per stage, sized by its services, one dot per service
+   COLOUR navy ground; stage scale blue, teal, yellow, orange, red
+   TYPE Red Hat Display 800 + Red Hat Text
+   LAYOUT title over full-width route; toolbar; grouped card grid; side panel for detail. Phone: stations stack */
+:root{color-scheme:dark;--bg:#0b1433;--sf:#121d46;--sf2:#18265a;--line:#2a3a78;--ink:#eef1ff;--mute:#aab3da;--assess:#3b4fd8;--prototype:#4fc1c6;--deploy:#f7e463;--govern:#f08a3c;--upskill:#e8452c;--navy:#0b1433}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:120px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Red Hat Text",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Red Hat Display",system-ui,sans-serif;margin:0;letter-spacing:-.02em;line-height:1.08}
+button,input,select{font:inherit;color:inherit}
+.band{padding-block:clamp(24px,3.5vw,52px);padding-inline:max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+header.band{padding-bottom:20px}
+.head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 32px}
+h1{font-size:clamp(32px,5vw,50px);font-weight:800;text-wrap:balance}
+.lede{margin:10px 0 0;color:var(--mute);max-width:60ch}
+.tally{display:flex;gap:28px}
+.tally div{font-family:"Red Hat Display",system-ui,sans-serif;font-weight:800;font-size:clamp(28px,4vw,40px);line-height:1}
+.tally span{display:block;font:500 14px "Red Hat Text",system-ui,sans-serif;color:var(--mute);margin-top:4px}
+.route{display:flex;gap:6px;margin-top:28px;min-height:230px}
+.stop{flex:1 1 0;position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;border:0;padding:18px 26px 18px 34px;cursor:pointer;background:var(--c);color:var(--k);clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%,18px 50%);transition:filter .2s,opacity .2s;min-width:150px}
+.stop:first-child{padding-left:20px;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%)}
+.stop:last-child{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,18px 50%)}
+.stop:hover{filter:brightness(1.08)}
+.stop:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.route.picked .stop:not(.on){opacity:.38}
+.stop h2{font-size:20px;font-weight:800}
+.stop .q{font-size:15px;line-height:1.3;opacity:.9;max-width:22ch}
+.stop .n{font:800 44px/1 "Red Hat Display",system-ui,sans-serif;margin-top:auto}
+.stop .n small{font:600 14px "Red Hat Text",system-ui,sans-serif;margin-left:6px}
+.dots{display:flex;flex-wrap:wrap;gap:5px;max-width:100%}
+.dots i{width:11px;height:11px;border-radius:50%;background:currentColor;opacity:.85}
+.dots i.off{opacity:.22}
+.dots b{width:6px}
+.hint{color:var(--mute);font-size:14px;margin:12px 0 0}
+.bar{position:relative;z-index:5;background:var(--bg);border-block:1px solid var(--line);padding-block:12px}
+@media(min-width:900px){.bar{position:sticky;top:0}}
+.tools{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.search{flex:1 1 260px;position:relative}
+.search input{width:100%;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--sf);padding:0 14px 0 40px;font-size:16px}
+.search svg{position:absolute;left:13px;top:13px;width:18px;height:18px;stroke:var(--mute)}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--prototype);outline-offset:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{height:44px;padding:0 14px;border:0;background:var(--sf);cursor:pointer;white-space:nowrap}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--navy);font-weight:600}
+select{height:44px;border-radius:10px;border:1px solid var(--line);background:var(--sf);padding:0 12px;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{min-height:36px;padding:4px 14px;border-radius:99px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:14px}
+.chip[aria-pressed=true]{background:var(--sf2);border-color:var(--ink)}
+.chip.clear{border-style:dashed;color:var(--mute)}
+main.band{padding-top:28px}
+.status{color:var(--mute);margin:0 0 8px;font-size:15px}
+.group{margin-top:34px}
+.ghead{display:flex;align-items:center;gap:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.sw{flex:none;width:28px;height:28px;border-radius:7px;background:var(--c,var(--sf2))}
+.ghead h2{font-size:26px;font-weight:800}
+.ghead p{margin:2px 0 0;color:var(--mute);font-size:15px}
+.ghead .ct{margin-left:auto;font:800 22px "Red Hat Display",system-ui,sans-serif;color:var(--mute)}
+.sub{font:700 17px "Red Hat Display",system-ui,sans-serif;margin:22px 0 10px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:14px;margin-top:14px}
+.card{position:relative;display:flex;flex-direction:column;gap:8px;background:var(--sf);border:1px solid var(--line);border-radius:14px;padding:18px 18px 14px;transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--mute)}
+.card h3{font-size:18px;font-weight:700}
+.card h3 button{all:unset;cursor:pointer}
+.card h3 button::after{content:"";position:absolute;inset:0;border-radius:14px}
+.card h3 button:focus-visible::after{outline:2px solid var(--prototype);outline-offset:2px}
+.card p{margin:0;color:var(--mute);font-size:15px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px;font-size:13px}
+.meta span{padding:2px 9px;border-radius:99px;background:var(--sf2);color:var(--ink);white-space:nowrap}
+.meta .st{background:var(--c);color:var(--k)}
+.empty{padding:40px 0;color:var(--mute)}
+.empty button{background:none;border:0;color:var(--prototype);text-decoration:underline;cursor:pointer;padding:0}
+footer.band{border-top:1px solid var(--line);color:var(--mute);font-size:14px}
+.scrim{position:fixed;inset:0;background:rgba(3,6,20,.6);z-index:20;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.open{opacity:1;pointer-events:auto}
+.panel{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);z-index:21;background:var(--sf);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
+.panel.open{transform:none}
+.ptop{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.ptop .x{margin-left:auto;width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-size:22px;line-height:1}
+.pbody{overflow-y:auto;padding:22px 24px 32px}
+.pbody h2{font-size:clamp(24px,3vw,30px);font-weight:800;margin:10px 0 14px}
+.pbody p{margin:0 0 14px}
+.pbody ul{margin:0 0 16px;padding-left:20px}
+.pbody li{margin-bottom:6px}
+.pbody h3{font-size:16px;font-weight:700;margin:22px 0 8px;color:var(--mute)}
+.kv{display:flex;flex-wrap:wrap;gap:6px}
+.kv span{padding:3px 10px;border-radius:99px;background:var(--sf2);font-size:14px}
+.rel{display:grid;gap:8px}
+.rel button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px}
+.rel button:hover,.rel button:focus-visible{border-color:var(--ink)}
+.rel i{flex:none;width:12px;height:12px;border-radius:50%;background:var(--c)}
+.pact{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.btn{height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-weight:600}
+.note{font-size:14px;color:var(--mute)}
+@media(max-width:760px){
+.route{flex-direction:column;gap:4px;min-height:0}
+.stop,.stop:first-child,.stop:last-child{clip-path:none;border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 12px;min-width:0}
+.stop h2{font-size:18px}
+.stop .q{grid-column:1;font-size:14px}
+.stop .n{grid-column:2;grid-row:1 / span 3;font-size:34px;margin:0}
+.stop .n small{display:none}
+.dots{grid-column:1}
+.dots i{width:9px;height:9px}
+.tally{gap:20px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="band">
+ <div class="wrap">
+  <div class="head">
+   <div>
+    <h1>GATE services catalogue</h1>
+    <p class="lede">Data, AI and digital twin services for companies and public bodies, arranged as a route from a first assessment to a trained, compliant team. Pick a stage, a theme or a sector to narrow it down.</p>
+   </div>
+   <div class="tally"><div id="tS">0<span>services</span></div><div>5<span>stages</span></div></div>
+  </div>
+  <nav class="route" id="route" aria-label="Service stages"></nav>
+  <p class="hint">Click a stage to show only its services; click it again to see all of them.</p>
+ </div>
+</header>
+
+<div class="bar band" style="padding-block:12px">
+ <div class="wrap">
+  <div class="tools">
+   <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/></svg><span class="sr" style="position:absolute;left:-9999px">Search services</span><input id="q" type="search" placeholder="Search, e.g. forecasting, AI Act, walkability" autocomplete="off"></label>
+   <div class="seg" role="group" aria-label="Group by">
+    <button id="gStage" data-g="stage" aria-pressed="true">By stage</button><button id="gTheme" data-g="theme" aria-pressed="false">By theme</button><button id="gSector" data-g="sector" aria-pressed="false">By sector</button>
+   </div>
+   <select id="sector" aria-label="Sector"></select>
+  </div>
+  <div class="chips" id="chips" aria-label="Filter by theme"></div>
+ </div>
+</div>
+
+<main class="band">
+ <div class="wrap">
+  <p class="status" id="status" aria-live="polite"></p>
+  <div id="list"></div>
+ </div>
+</main>
+
+<footer class="band"><div class="wrap">Source: GATE services list, November 2026. Theme and sector tags are drawn from each service's own description.</div></footer>
+
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel" aria-hidden="true" aria-labelledby="pTitle">
+ <div class="ptop"><span id="pTag"></span><button class="x" id="pClose" aria-label="Close">×</button></div>
+ <div class="pbody" id="pBody"></div>
+</aside>
+
+<script>
+{
+const DATA={"services": [{"n": "Digital Maturity Assessment", "d": "Diagnosing company’s needs and readiness in relation to digital technologies, with a focus on data and AI, providing feedback on its level of maturity", "b": [], "s": "assess", "g": "", "t": ["strategy", "data", "ai"], "x": [], "f": ""}, {"n": "Digital Transformation Strategy Development", "d": "This service supports organisations in defining a realistic and coherent digital transformation strategy. The strategy outlines priorities, sequencing of actions, indicative timelines and required resources, taking into account sector characteristics and organisational constraints.", "b": [], "s": "assess", "g": "", "t": ["strategy"], "x": [], "f": ""}, {"n": "Data Health Check Analysis", "d": "A service that helps organisations evaluate and maximize the value of their data by mapping existing data assets, assessing their quality and accessibility, and uncovering opportunities for improvement and innovation. Through structured workshops and targeted analysis, this engagement identifies strengths such as reliable, high-value datasets and robust governance practices, while pinpointing weaknesses like quality gaps, integration issues, or limited availability. The process results in a prioritized roadmap that enables organisations to strengthen their data foundation, improve decision-making, and reveal actionable opportunities for advanced analytics, governance, AI and data-driven growth.", "b": [], "s": "assess", "g": "", "t": ["data", "strategy"], "x": [], "f": ""}, {"n": "AI Readiness Assessment and Opportunity Mapping", "d": "This service evaluates an organisation’s readiness to adopt AI based solutions, focusing on data availability and quality, organisational capacity, relevance and risk profile. It identifies suitable low medium or high risk AI opportunities and provides guidance on appropriate next steps. The service supports informed decision making and avoids premature or inappropriate AI investments.", "b": [], "s": "assess", "g": "", "t": ["ai", "strategy", "reg"], "x": [], "f": ""}, {"n": "Data Prep for Machine Learning", "d": "This service provides high-quality data processing, cleaning, and transformation for effective machine learning. Ideal for AI projects in healthcare, finance, transportation, and automation, it ensures that data is well-prepared and optimized for training machine learning models.", "b": [], "s": "assess", "g": "", "t": ["data", "ai"], "x": ["health", "finance", "transport", "manufacturing"], "f": ""}, {"n": "Digital Twin-Based Validation Services", "d": "This service supports validation and optimisation of industrial processes and products using digital twin technologies. Applications include process optimisation, industrial environment modelling and product customisation. The service enables testing and validation before investment decisions are taken.", "b": [], "s": "prototype", "g": "", "t": ["twin"], "x": ["manufacturing"], "f": ""}, {"n": "AI, Machine Learning and Data-Based Validation", "d": "This service provides expert guided testing and validation of AI and data driven applications, including predictive modelling, quality assurance use cases and data analytics solutions. It focuses on feasibility and performance validation rather than full scale development", "b": [], "s": "prototype", "g": "", "t": ["ai", "data"], "x": [], "f": ""}, {"n": "Modelling, Prototyping and Virtual Production", "d": "This service supports modelling, virtual prototyping and validation of production processes and products using advanced digital tools such as 3D modelling, scanning and simulation environments.", "b": [], "s": "prototype", "g": "", "t": ["twin"], "x": ["manufacturing"], "f": ""}, {"n": "Data Analysis & Processing", "d": "This service offers advanced big data analysis and processing using machine learning to optimize business processes, uncover hidden trends, and enhance decision-making. It includes automated data collection, cleaning, transformation, and analysis from diverse sources. By leveraging predictive analytics, it identifies patterns, anomalies, and key business factors. The service provides dynamic visualizations and detailed reports to support strategic decisions and improve operational efficiency.", "b": [], "s": "deploy", "g": "Business & Operations Optimisation", "t": ["data", "ai"], "x": [], "f": ""}, {"n": "AI Optimisation and Industry Forecast", "d": "This service uses AI and data analysis to forecast, optimize, and automate production processes. AI algorithms analyze time-series data to predict equipment failures, optimize inventory management, and improve resource efficiency. It is ideal for manufacturing plants, logistics centers, and automated businesses, helping to enhance operational efficiency, reduce downtime, and improve overall productivity through advanced AI-driven optimization and forecasting techniques.", "b": [], "s": "deploy", "g": "Business & Operations Optimisation", "t": ["ai", "data"], "x": ["manufacturing", "transport"], "f": ""}, {"n": "Automated Text and Document Processing with AI", "d": "This service offers AI-powered automated text and document processing using Natural Language Processing (NLP). It automates document recognition, categorization, summarization, and extraction of key data. Ideal for banks, insurance companies, law firms, and administrative organizations, it streamlines workflows, enhances efficiency, and improves data management through advanced AI analysis and structuring of documents.", "b": [], "s": "deploy", "g": "Business & Operations Optimisation", "t": ["ai"], "x": ["finance", "legal", "public"], "f": ""}, {"n": "AI-based multispectral and hyperspectral image analysis", "d": "This service provides AI-powered multispectral and hyperspectral image analysis to detect issues across various industries. The AI technology analyzes water and nutrient stress, diseases, defects, and structural anomalies. It is applicable in agriculture, environmental monitoring, infrastructure, manufacturing, and healthcare, offering advanced insights for problem detection and process optimization.", "b": [], "s": "deploy", "g": "Business & Operations Optimisation", "t": ["ai", "urban"], "x": ["agri", "manufacturing", "construction", "health"], "f": ""}, {"n": "Optimal Location Insight", "d": "This service offers data-driven insights for businesses to find optimal locations for new branches or outlets. It leverages spatial data, predictive models, and supply-demand analysis of amenities within walking or public transport reach. By assessing market landscapes and customer demand, the service enables smarter decision-making, helping businesses expand strategically while improving access to key services in urban areas.", "b": [], "s": "deploy", "g": "Spatial & Urban Analytics", "t": ["urban", "data"], "x": ["retail"], "f": ""}, {"n": "Supply-demand and location allocation of urban facilities", "d": "This service includes supply-demand analysis of urban facilities and dynamic location-allocation models based on citizens’ needs for 15-minute walking access to kindergartens, schools, health centres, offices, sports facilities, parks, etc. The analyses are based on a pedestrian network, which is transformed into a graph for the application of traversal algorithms.", "b": [], "s": "deploy", "g": "Spatial & Urban Analytics", "t": ["urban"], "x": ["public"], "f": ""}, {"n": "Walkability index", "d": "This service applies the 15-minute city concept and introduces an accessibility index that evaluates residential access to points of interest (POIs), incorporating diversity metrics, including the Shannon and Simpson indices. The sidewalk infrastructure and pedestrian network connectivity are accessed using weighted POIs to measure walkable access. By defining a sustainable urban environment in terms of accessibility, POI richness, and evenness, the service delivers a robust tool for assessing the compliance of urban neighbourhoods with the 15-minute city concept.", "b": [], "s": "deploy", "g": "Spatial & Urban Analytics", "t": ["urban"], "x": ["public"], "f": ""}, {"n": "Urban what-if scenario generation", "d": "This service includes the generation of reusable what-if scenarios, enabling planners to create, modify, and test semantically rich, context-aware urban settings interactively with minimal manual effort. The scenarios are analysed to extract KPIs, supporting evidence-based decision-making and expanding stakeholders’ ability to explore diverse options. The service combines creativity with analytical precision, including effort estimation for implementation, thereby bridging digital exploration and real-world urban transformation.", "b": [], "s": "deploy", "g": "Spatial & Urban Analytics", "t": ["urban", "twin"], "x": ["public"], "f": ""}, {"n": "Advanced urban data query", "d": "Advanced query services unify access to diverse urban datasets through reusable, AI-enabled interfaces. A data access layer abstracts differences across relational, document-oriented, and graph databases, while a Natural Language Interface powered by LLMs and Retrieval-Augmented Generation (RAG) translates user queries into structured database requests. This will allow experts and non-technical stakeholders alike to interrogate complex geospatial and simulation data intuitively, lowering barriers to adoption.", "b": [], "s": "deploy", "g": "Spatial & Urban Analytics", "t": ["urban", "data", "ai"], "x": ["public"], "f": ""}, {"n": "Air quality prediction", "d": "The air quality prediction service leverages real-time sensor data and advanced machine learning models to deliver accurate, forward-looking insights into environmental conditions. By continuously analysing inputs such as particulate matter, gas concentrations, temperature, and humidity, the models learn complex patterns and trends that influence air quality levels. They adapt over time as new data is collected, enabling reliable short-term and long-term forecasts. This empowers organisations, cities, and individuals to make proactive decisions, mitigate health risks, and respond effectively to changing air quality conditions.", "b": [], "s": "deploy", "g": "Spatial & Urban Analytics", "t": ["urban", "ai"], "x": ["public"], "f": ""}, {"n": "Urban Planning Analysis", "d": "This service provides data-driven insights to support planners, municipalities, and developers in creating sustainable and efficient urban environments. Using spatial data, predictive models, and visualizations, it enables smarter decision-making and strategic development. The service improves infrastructure investment decisions, enhances urban sustainability and resilience, and reduces risks associated with poorly planned urban expansion.", "b": [], "s": "deploy", "g": "Spatial & Urban Analytics", "t": ["urban", "data"], "x": ["public", "construction"], "f": ""}, {"n": "Climate simulations", "d": "This service includes the design and execution of high-resolution urban climate simulations and scenario-based urban analysis. Simulation outputs can be integrated into GIS platforms (QGIS, ArcGIS) for spatial analysis and land-use processing, and to support data-driven decision-making. The climate simulations will be performed using the Weather Research and Forecasting (WRF) model, which is an advanced numerical weather prediction and atmospheric simulation system widely used for research and operational applications.", "b": [], "s": "deploy", "g": "Spatial & Urban Analytics", "t": ["urban", "twin"], "x": ["public"], "f": ""}, {"n": "Airflow, Ventilation & Indoor Environmental Analysis", "d": "Computational fluid dynamics (CFD) simulations are used to analyse airflow and ventilation behaviour in industrial indoor environments, accounting for the presence of production equipment, ventilation layout and operating conditions. The analyses support identification of zones with unfavourable air circulation, limited ventilation effectiveness or potential accumulation of airborne contaminants.", "b": ["Analysis of airflow patterns around production lines and equipment", "Identification of zones with potential accumulation of airborne contaminants", "Assessment of the performance of existing HVAC systems", "Virtual testing of improvement scenarios (ventilation strategies, layout changes, operating regimes)", "Engineering decision support without interference with ongoing operations"], "s": "deploy", "g": "Industrial Environment Engineering", "t": ["twin"], "x": ["manufacturing"], "f": ""}, {"n": "Hybrid AI for Safety Risk Assessment in Manufacturing", "d": "This service provides an AI-powered system for interactive modeling and safety risk assessment in manufacturing. It uses stochastic intelligent graphs and advanced AI to automatically evaluate and optimize business processes. Ideal for production lines, mechanical assembly, and automated flow processes, the service enhances safety and efficiency in industrial environments.", "b": [], "s": "deploy", "g": "Industrial Environment Engineering", "t": ["ai"], "x": ["manufacturing"], "f": ""}, {"n": "Smart Infrastructure and Facility Management", "d": "Smart Infrastructure helps SMEs, public institutions, and construction/civil engineering/facility management firms manage infrastructure across its full lifecycle using digital twins. It enables predictive maintenance and better planning by continuously monitoring assets, anticipating issues early, and optimizing maintenance and upgrades.", "b": [], "s": "deploy", "g": "Infrastructure Operations", "t": ["twin"], "x": ["construction", "public"], "f": ""}, {"n": "AI Act Readiness Support", "d": "This service supports organisations in understanding and addressing regulatory and governance requirements related to deployment of AI in line with the EU AI Act. It includes AI risk classification, governance guidance, basic compliance roadmaps and advisory support for responsible use of AI The service focuses on operational readiness rather than legal interpretation.", "b": [], "s": "govern", "g": "", "t": ["reg", "ai"], "x": [], "f": ""}, {"n": "AI Discovery & Regulatory Testing", "d": "This service offers lightweight proof of concept/ demo activities combined with preliminary AI risk classification and regulatory testing. It enables organisations to explore AI use cases on standard platforms, assess feasibility and identify regulatory implications at an early stage, for example, regarding data management and governance. Based on the results, organisations are guided towards appropriate pathways - continued implementation, referral to services of AI Factory or preparation for entry into an AI regulatory sandbox", "b": [], "s": "govern", "g": "", "t": ["reg", "ai"], "x": [], "f": ""}, {"n": "Big Data Training", "d": "Training courses covering Big Data fundamentals, architectures, data management, visualisation and data sharing.", "b": [], "s": "upskill", "g": "", "t": ["skills", "data"], "x": [], "f": ""}, {"n": "AI and Scalable AI Training", "d": "Training on practical AI applications, machine learning and deep learning, including scalable AI approaches.", "b": [], "s": "upskill", "g": "", "t": ["skills", "ai"], "x": [], "f": ""}, {"n": "E-Transformation and Digital Leadership Training", "d": "Training focused on organisational change, management and leadership aspects of digital transformation.", "b": [], "s": "upskill", "g": "", "t": ["skills", "strategy"], "x": [], "f": ""}, {"n": "AI Regulatory Literacy, Tier 1: Foundational training", "d": "Training on responsible AI use, AI Act basics, risk classification and governance principles, supporting informed and compliant AI adoption.", "b": [], "s": "upskill", "g": "", "t": ["skills", "reg", "ai"], "x": [], "f": "basic training in e-learning format"}, {"n": "AI Regulatory Literacy, Tier 2: In-depth AI training", "d": "Training on responsible AI use, AI Act basics, risk classification and governance principles, supporting informed and compliant AI adoption.", "b": [], "s": "upskill", "g": "", "t": ["skills", "reg", "ai"], "x": [], "f": "advanced in-person training developed by GATE"}, {"n": "AI Regulatory Literacy, Tier 3: Tailored high-risk AI training", "d": "Training on responsible AI use, AI Act basics, risk classification and governance principles, supporting informed and compliant AI adoption.", "b": [], "s": "upskill", "g": "", "t": ["skills", "reg", "ai"], "x": [], "f": "advanced in-person workshop for organisations developing or deploying high-risk AI systems"}], "projects": ["Intelligent Agent for the Transition to a Green Environment", "Query-driven knowledge graphs: an autonomous system for organising and extracting knowledge", "MULTIMOD-AI: a multimodal platform with explainable AI for compliant propaganda analysis and detection", "AI bot for optimal restructuring of individuals’ financial debts", "Development of CraftGenie AI through green and digital partnerships for smart transformation", "Green and digital partnership for an autonomous quality-control robot", "Smart digital platform for managing energy communities through agent-based systems and AI", "DataSpace platform for optimising logistics operations: Fleet Pulse", "AI platform for transcription and structuring of clinical data"]};
+const STAGES=[
+ {id:'assess',name:'Assess & Prepare',q:'Where do we stand with data and AI?',k:'#fff'},
+ {id:'prototype',name:'Prototype & Validate',q:'Test it before you invest in it',k:'#0b1433'},
+ {id:'deploy',name:'Deploy & Optimise',q:'Put data and AI to work in operations',k:'#0b1433'},
+ {id:'govern',name:'Govern & Comply',q:'Get ready for the EU AI Act',k:'#0b1433'},
+ {id:'upskill',name:'Upskill & Enable',q:'Train the people who will use it',k:'#fff'}];
+const THEMES={strategy:'Strategy & maturity',data:'Data & analytics',ai:'AI & machine learning',twin:'Digital twins & simulation',urban:'Cities & environment',reg:'AI regulation',skills:'Training'};
+const SECTORS={manufacturing:'Manufacturing',transport:'Transport & logistics',finance:'Finance & insurance',health:'Healthcare',agri:'Agriculture',public:'Public sector & cities',construction:'Construction & facilities',retail:'Retail & services',legal:'Legal & administration'};
+const SG=Object.fromEntries(STAGES.map(s=>[s.id,s]));
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S=DATA.services.map((s,i)=>({...s,i}));
+const $=id=>document.getElementById(id);
+const st={q:'',stage:'',themes:new Set(),sector:'',group:'stage'};
+const cv=s=>`--c:var(--${s});--k:${SG[s].k}`;
+const sectorsOf=s=>s.x.length?s.x:['any'];
+const secName=x=>x==='any'?'Any sector':SECTORS[x];
+
+$('tS').firstChild.textContent=S.length;
+$('sector').innerHTML='<option value="">All sectors</option>'+Object.entries(SECTORS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+
+const match=s=>{
+ if(st.stage&&s.s!==st.stage)return false;
+ if(st.themes.size&&!s.t.some(t=>st.themes.has(t)))return false;
+ if(st.sector&&!s.x.includes(st.sector))return false;
+ if(st.q){const h=(s.n+' '+s.d+' '+s.b.join(' ')+' '+s.g+' '+s.f+' '+s.t.map(t=>THEMES[t]).join(' ')+' '+s.x.map(x=>SECTORS[x]).join(' ')).toLowerCase();
+  if(!st.q.split(/\s+/).every(w=>h.includes(w)))return false}
+ return true};
+
+const drawRoute=()=>{
+ const hits=new Set(S.filter(match).map(s=>s.i));
+ $('route').classList.toggle('picked',!!st.stage);
+ $('route').innerHTML=STAGES.map(g=>{
+  const list=S.filter(s=>s.s===g.id);let prev=null;
+  const dots=list.map(s=>{const gap=prev!==null&&s.g!==prev?'<b></b>':'';prev=s.g;
+   const on=st.stage?s.s===st.stage&&hits.has(s.i):hits.has(s.i)||(!st.q&&!st.themes.size&&!st.sector);
+   return gap+`<i class="${on?'':'off'}" title="${esc(s.n)}"></i>`}).join('');
+  const n=list.filter(s=>{const o=st.stage;st.stage='';const m=match(s);st.stage=o;return m}).length;
+  return `<button class="stop${st.stage===g.id?' on':''}" style="${cv(g.id)};flex-grow:${3+list.length}" data-s="${g.id}" aria-pressed="${st.stage===g.id}"><h2>${g.name}</h2><span class="q">${g.q}</span><span class="n">${n}<small>${n===1?'service':'services'}</small></span><span class="dots">${dots}</span></button>`}).join('')};
+
+const card=s=>`<article class="card"><h3><button data-open="${s.i}">${esc(s.n)}</button></h3><p>${esc(s.d)}</p><div class="meta"><span class="st" style="${cv(s.s)}">${SG[s.s].name}</span>${s.t.slice(0,2).map(t=>`<span>${THEMES[t]}</span>`).join('')}${s.f.startsWith('basic')?'<span>E-learning</span>':''}</div></article>`;
+
+const section=(key,title,sub,items,style)=>`<section class="group"><div class="ghead"><span class="sw" style="${style||''}"></span><div><h2>${title}</h2>${sub?`<p>${sub}</p>`:''}</div><span class="ct">${items.length}</span></div>${items.html}</section>`;
+
+const drawList=()=>{
+ const hits=S.filter(match);
+ let html='';
+ if(st.group==='stage'){
+  for(const g of STAGES){const its=hits.filter(s=>s.s===g.id);if(!its.length)continue;
+   const subs=[...new Set(its.map(s=>s.g))];
+   const body=subs.map(sg=>(sg?`<h3 class="sub">${esc(sg)}</h3>`:'')+`<div class="grid">${its.filter(s=>s.g===sg).map(card).join('')}</div>`).join('');
+   html+=section(g.id,g.name,g.q,{length:its.length,html:body},cv(g.id))}
+ }else if(st.group==='theme'){
+  for(const[k,v]of Object.entries(THEMES)){const its=hits.filter(s=>s.t.includes(k));if(!its.length)continue;
+   html+=section(k,v,'',{length:its.length,html:`<div class="grid">${its.map(card).join('')}</div>`})}
+ }else{
+  for(const k of[...Object.keys(SECTORS),'any']){const its=hits.filter(s=>sectorsOf(s).includes(k));if(!its.length)continue;
+   html+=section(k,secName(k),k==='any'?'Cross-industry services with no sector named':'',{length:its.length,html:`<div class="grid">${its.map(card).join('')}</div>`})}
+ }
+ const filt=st.q||st.stage||st.themes.size||st.sector;
+ $('list').innerHTML=html||`<p class="empty">No services match these filters. <button id="reset2">Clear all filters</button></p>`;
+ const dup=st.group!=='stage'?' Services that fit several groups appear in each.':'';
+ $('status').textContent=(filt?`${hits.length} of ${S.length} services match.`:`All ${S.length} services.`)+dup;
+ $('reset2')?.addEventListener('click',reset)};
+
+const drawChips=()=>{
+ $('chips').innerHTML=Object.entries(THEMES).map(([k,v])=>`<button class="chip" data-t="${k}" aria-pressed="${st.themes.has(k)}">${v}</button>`).join('')+
+  ((st.q||st.stage||st.themes.size||st.sector)?'<button class="chip clear" id="reset">Clear filters</button>':'');
+ $('reset')?.addEventListener('click',reset)};
+
+const render=()=>{drawRoute();drawChips();drawList()};
+const reset=()=>{st.q='';st.stage='';st.themes.clear();st.sector='';$('q').value='';$('sector').value='';setHash();render()};
+const setHash=()=>{try{history.replaceState(null,'',st.stage?'#'+st.stage:location.pathname)}catch(e){}};
+
+let lastFocus=null;
+const openPanel=(tag,html)=>{lastFocus=document.activeElement;$('pTag').innerHTML=tag;$('pBody').innerHTML=html;$('pBody').scrollTop=0;
+ $('panel').classList.add('open');$('scrim').classList.add('open');$('panel').setAttribute('aria-hidden','false');$('pClose').focus()};
+const closePanel=()=>{$('panel').classList.remove('open');$('scrim').classList.remove('open');$('panel').setAttribute('aria-hidden','true');lastFocus?.focus?.()};
+
+const showService=i=>{
+ const s=S[i],g=SG[s.s],nx=STAGES.findIndex(x=>x.id===s.s)+1;
+ const score=o=>o.t.filter(t=>s.t.includes(t)).length+(o.x.some(x=>s.x.includes(x))?1:0);
+ const rel=S.filter(o=>o.i!==i&&score(o)>0).sort((a,b)=>score(b)-score(a)||(a.s===s.s)-(b.s===s.s)).slice(0,4);
+ const next=nx<STAGES.length?S.filter(o=>o.s===STAGES[nx].id&&o.t.some(t=>s.t.includes(t))).slice(0,3):[];
+ const relList=l=>`<div class="rel">${l.map(o=>`<button data-open="${o.i}" style="${cv(o.s)}"><i></i>${esc(o.n)}</button>`).join('')}</div>`;
+ openPanel(`<span class="meta"><span class="st" style="${cv(s.s)}">${g.name}</span>${s.g?`<span>${esc(s.g)}</span>`:''}</span>`,
+  `<h2 id="pTitle">${esc(s.n)}</h2><p>${esc(s.d)}</p>${s.b.length?`<ul>${s.b.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>`:''}
+  ${s.f?`<h3>Format</h3><p>${esc(s.f.charAt(0).toUpperCase()+s.f.slice(1))}</p>`:''}
+  <h3>Themes</h3><div class="kv">${s.t.map(t=>`<span>${THEMES[t]}</span>`).join('')}</div>
+  <h3>Sectors named</h3><div class="kv">${sectorsOf(s).map(x=>`<span>${secName(x)}</span>`).join('')}</div>
+  ${next.length?`<h3>Natural next step: ${STAGES[nx].name}</h3>${relList(next)}`:''}
+  ${rel.length?`<h3>Related services</h3>${relList(rel)}`:''}
+  <div class="pact"><button class="btn" data-close="1">Close</button></div>`)};
+
+document.addEventListener('click',e=>{
+ const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.s){st.stage=st.stage===t.dataset.s?'':t.dataset.s;setHash();render();if(st.stage)$('list').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})}
+ else if(t.dataset.t){const k=t.dataset.t;st.themes.has(k)?st.themes.delete(k):st.themes.add(k);render()}
+ else if(t.dataset.open){showService(+t.dataset.open)}
+ else if(t.dataset.close){closePanel()}
+ else if(t.dataset.g){st.group=t.dataset.g;document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b===t));drawList()}});
+$('q').addEventListener('input',e=>{st.q=e.target.value.trim().toLowerCase();render()});
+$('sector').addEventListener('change',e=>{st.sector=e.target.value;render()});
+$('pClose').addEventListener('click',closePanel);
+$('scrim').addEventListener('click',closePanel);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('panel').classList.contains('open'))closePanel()});
+const fromHash=()=>{const h=location.hash.slice(1);st.stage=SG[h]?h:'';render()};
+window.addEventListener('hashchange',fromHash);
+fromHash();
+}
+</script>
+</body>
+</html>
